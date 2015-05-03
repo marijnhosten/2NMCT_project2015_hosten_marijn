@@ -1,8 +1,8 @@
 package mobile.nmct.desopdracht;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.app.ListFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -12,24 +12,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Locale;
 
 
-public class OverzichtFragment extends ListFragment {
+public class OverzichtFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String GEKOZEN_STAD = "gekozen_stad";
-    private static final String OMGEVING = "omgeving";
 
     private OnFragmentInteractionListener mListener;
 
@@ -45,10 +45,8 @@ public class OverzichtFragment extends ListFragment {
 
     private TextView txtStad;
     private Button btnStad;
-    private Button btnZoek;
 
-    private ArrayList<String> listItems;
-    private ListAdapter adapter;
+    private GoogleMap mMap;
 
     public OverzichtFragment() {
         // Required empty public constructor
@@ -59,7 +57,6 @@ public class OverzichtFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             stad = getArguments().getString(GEKOZEN_STAD);
-            omgeving = getArguments().getString(OMGEVING);
         }
     }
 
@@ -71,7 +68,6 @@ public class OverzichtFragment extends ListFragment {
 
         txtStad = (TextView) v.findViewById(R.id.txtStad);
         btnStad = (Button) v.findViewById(R.id.btnStad);
-        btnZoek = (Button) v.findViewById(R.id.btnZoek);
 
         return v;
     }
@@ -79,54 +75,79 @@ public class OverzichtFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
+
+
+
         btnStad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                vulListOmgeving();
+                stad = txtStad.getText().toString();
+                toonOmgeving(stad);
             }
         });
     }
 
-    private void vulListOmgeving() {
+    private void toonOmgeving(String stad) {
 
-        listItems = new ArrayList<String>();
-
-        if(txtStad.getText().toString().isEmpty()) {
-            Log.d("TEST", "Gelieve een stad in te vullen");
-        }else {
-            Log.d("TEST", "Vul listview op");
-
-            //OMGEVINGEN VAN DE STAD OPHALEN VIA GOOGLE MAPS API
-            omgevingenOphalen();
-
-            //gegevens in adapter steken
-            adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, listItems) {
-            };
-            setListAdapter(adapter);
+        if(!stad.equals("")) {
+            omgevingenOphalen(stad);
         }
     }
 
-    private void omgevingenOphalen() {
+    private void omgevingenOphalen(String stad) {
 
-        stad = txtStad.getText().toString();
-
-
-
-        try
-        {
-            Geocoder geo = new Geocoder(getActivity(), Locale.getDefault());
-            List<Address> addressList = geo.getFromLocationName(stad, 1);
-            if(addressList.size()>0) {
-                Log.d("TEST", "lat: " + addressList.get(0).getLatitude());
-                Log.d("TEST", "lon: " + addressList.get(0).getLongitude());
-
-                //listItems.add(stad);
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+                setUpMap(stad);
             }
-        }catch (IOException exc){
+        }else{
+            setUpMap(stad);
+        }
+    }
+
+    private void setUpMap(String stad) {
+
+        List<Address> addressList;
+        double lat, lon;
+
+        Geocoder geo = new Geocoder(getActivity(), Locale.getDefault());
+        try {
+            addressList = geo.getFromLocationName(stad, 1);
+            if(addressList.size()>0) {
+                lat = addressList.get(0).getLatitude();
+                lon = addressList.get(0).getLongitude();
+
+                String land = addressList.get(0).getCountryName();
+                stad = stad.substring(0,1).toUpperCase() + stad.substring(1).toLowerCase();
+
+                LatLng gekozenStad = new LatLng(lat, lon);
+
+                mMap.addMarker(new MarkerOptions().position(gekozenStad).title(stad + " - " + land)).showInfoWindow();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(gekozenStad, 10));
+
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        ToonKeuzeFragment();
+                        return true;
+                    }
+                });
+            }
+        }catch(Exception exc) {
             Log.d("TEST", exc.getMessage());
         }
+    }
 
-
+    private void ToonKeuzeFragment() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(R.id.container, new KeuzeFragment());
+        ft.addToBackStack("KeuzeFragment");
+        ft.commit();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

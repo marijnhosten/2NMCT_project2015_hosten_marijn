@@ -14,7 +14,8 @@ import android.view.ViewGroup;
 import android.os.Build;
 
 
-public class MainActivity extends ActionBarActivity implements OverzichtFragment.OnFragmentInteractionListener{
+public class MainActivity extends ActionBarActivity
+        implements KeuzeFragment.OnFragmentInteractionListener, OverzichtFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,7 @@ public class MainActivity extends ActionBarActivity implements OverzichtFragment
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, OverzichtFragment.newInstance())
+                    .addToBackStack("OverzichtFragment")
                     .commit();
         }
     }

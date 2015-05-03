@@ -3,10 +3,12 @@
     android:layout_height="match_parent" tools:context="mobile.nmct.desopdracht.OverzichtFragment">
 
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="left|top">
+        android:layout_gravity="center"
+        android:weightSum="1">
 
         <TextView
             android:layout_width="wrap_content"
@@ -14,9 +16,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Zoek een kot"
             android:id="@+id/txtTitle"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:textStyle="bold" />
@@ -25,58 +24,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/txtStad"
-            android:text="Kies een stad"
-            android:layout_below="@+id/txtTitle"
-            android:layout_alignLeft="@+id/txtTitle"
-            android:layout_alignStart="@+id/txtTitle"
-            android:layout_marginTop="31dp" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="zoek"
-            android:id="@+id/btnZoek"
-            android:layout_marginBottom="36dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:hint="Kies een stad"
+            android:layout_marginTop="31dp"
+            android:layout_marginLeft="10dp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ok"
             android:id="@+id/btnStad"
-            android:layout_below="@+id/txtStad"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"/>
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:id="@android:id/list"
-            android:layout_gravity="right|center_vertical"
-            android:layout_marginTop="78dp"
-            android:layout_below="@+id/btnStad"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Verfijn de omgeving"
+            android:text="Klik een marker"
             android:id="@+id/txtVerfijn"
-            android:layout_below="@+id/btnStad"
-            android:layout_alignLeft="@+id/txtStad"
-            android:layout_alignStart="@+id/txtStad"
-            android:layout_marginTop="33dp"
-            android:textStyle="bold" />
+            android:layout_marginTop="30dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp" />
 
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            class="com.google.android.gms.maps.MapFragment"
+            android:layout_marginTop="10dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </FrameLayout>
